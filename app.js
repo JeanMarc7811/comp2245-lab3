@@ -40,3 +40,32 @@ function buildBoard() {
 }
 
 buildBoard();
+
+
+
+const flippedCards = [];
+
+const board = document.querySelector("#board");
+
+board.addEventListener("click", (event) => {
+    const card = event.target;
+
+    if (!card.classList.contains("card")) {
+        return;
+    }
+
+   
+    if (card.classList.contains("flipped")) {
+        return;
+    }
+
+    const fruit = deck[Number(card.dataset.index)];
+    card.textContent = fruit.symbol;
+    card.classList.add("flipped");
+    card.setAttribute(
+        "aria-label",
+        `Card ${Number(card.dataset.index) + 1}, ${fruit.name}`
+    );
+
+    flippedCards.push(card);
+});
