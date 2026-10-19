@@ -9,6 +9,10 @@ const fruits = [
 { name: "watermelon", symbol: "🍉 " },
 ];
 
+let moves = 0;
+
+const movesDisplay = document.querySelector("#moves");
+const status = document.querySelector("#status");
 
 function shuffle(array) {
     for (let i = array.length - 1; i > 0; i--) {
@@ -24,7 +28,9 @@ const deck = shuffle([...fruits, ...fruits]);
 
 function buildBoard() {
     const board = document.querySelector("#board");
-
+    
+    board.innerHTML = "";
+    
     deck.forEach((fruit, i) => {
         const card = document.createElement("button");
 
@@ -67,5 +73,30 @@ board.addEventListener("click", (event) => {
         `Card ${Number(card.dataset.index) + 1}, ${fruit.name}`
     );
 
+
     flippedCards.push(card);
+
+    if (flippedCards.length === 2) {
+        moves++;
+        movesDisplay.textContent = moves;
+
+        const firstFruit = deck[Number(flippedCards[0].dataset.index)];
+        const secondFruit = deck[Number(flippedCards[1].dataset.index)];
+
+        if (firstFruit.name === secondFruit.name) {
+            flippedCards[0].classList.add("matched");
+            flippedCards[1].classList.add("matched");
+
+            flippedCards[0].disabled = true;
+            flippedCards[1].disabled = true;
+
+                status.textContent = "That's a pair!";
+
+            flippedCards.length = 0;
+        }
+    }
+
 });
+
+
+
