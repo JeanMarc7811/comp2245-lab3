@@ -10,6 +10,7 @@ const fruits = [
 ];
 
 let moves = 0;
+let waiting = false;
 
 const movesDisplay = document.querySelector("#moves");
 const status = document.querySelector("#status");
@@ -53,26 +54,31 @@ const flippedCards = [];
 
 const board = document.querySelector("#board");
 
+
 board.addEventListener("click", (event) => {
     const card = event.target;
+
+    if (waiting) {
+        return;
+    }
 
     if (!card.classList.contains("card")) {
         return;
     }
 
-   
     if (card.classList.contains("flipped")) {
         return;
     }
 
     const fruit = deck[Number(card.dataset.index)];
+
     card.textContent = fruit.symbol;
     card.classList.add("flipped");
+
     card.setAttribute(
         "aria-label",
         `Card ${Number(card.dataset.index) + 1}, ${fruit.name}`
     );
-
 
     flippedCards.push(card);
 
@@ -90,12 +96,32 @@ board.addEventListener("click", (event) => {
             flippedCards[0].disabled = true;
             flippedCards[1].disabled = true;
 
-                status.textContent = "That's a pair!";
+            status.textContent = "That's a pair!";
 
             flippedCards.length = 0;
+        } else {
+            status.textContent = "Not a pair. Try again.";
+
+            waiting = true;
+
+            setTimeout(() => {
+                flippedCards.forEach((flippedCard) => {
+                    const index = Number(flippedCard.dataset.index);
+
+                    flippedCard.textContent = "";
+                    flippedCard.classList.remove("flipped");
+
+                    flippedCard.setAttribute(
+                        "aria-label",
+                        `Card ${index + 1}, face down`
+                    );
+                });
+
+                flippedCards.length = 0;
+                waiting = false;
+            }, 1000);
         }
     }
-
 });
 
 
