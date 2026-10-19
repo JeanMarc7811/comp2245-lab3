@@ -99,6 +99,15 @@ board.addEventListener("click", (event) => {
             status.textContent = "That's a pair!";
 
             flippedCards.length = 0;
+
+            
+            const matchedCards = document.querySelectorAll("#board .matched");
+
+            if (matchedCards.length === 16) {
+                status.textContent = `You found all the pairs in ${moves} moves!`;
+                status.classList.add("you-won");
+            }
+
         } else {
             status.textContent = "Not a pair. Try again.";
 
