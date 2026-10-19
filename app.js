@@ -1,19 +1,26 @@
+
 const fruits = [
-{ name: "apple", symbol: "🍎 " },
-{ name: "banana", symbol: "🍌 " },
-{ name: "cherry", symbol: "🍒 " },
-{ name: "coconut", symbol: "🥥 " },
-{ name: "grapes", symbol: "🍇 " },
-{ name: "mango", symbol: "🥭 " },
-{ name: "pineapple", symbol: "🍍 " },
-{ name: "watermelon", symbol: "🍉 " },
+    { name: "apple", symbol: "🍎 " },
+    { name: "banana", symbol: "🍌 " },
+    { name: "cherry", symbol: "🍒 " },
+    { name: "coconut", symbol: "🥥 " },
+    { name: "grapes", symbol: "🍇 " },
+    { name: "mango", symbol: "🥭 " },
+    { name: "pineapple", symbol: "🍍 " },
+    { name: "watermelon", symbol: "🍉 " },
 ];
 
 let moves = 0;
 let waiting = false;
+let flipTimer = null;
+let deck = [];
 
 const movesDisplay = document.querySelector("#moves");
 const status = document.querySelector("#status");
+const board = document.querySelector("#board");
+const newGameButton = document.querySelector("#new-game");
+
+const flippedCards = [];
 
 function shuffle(array) {
     for (let i = array.length - 1; i > 0; i--) {
@@ -23,37 +30,43 @@ function shuffle(array) {
     return array;
 }
 
-const deck = shuffle([...fruits, ...fruits]);
-
-
-
 function buildBoard() {
-    const board = document.querySelector("#board");
-    
-    board.innerHTML = "";
-    
+    board.replaceChildren();
+
     deck.forEach((fruit, i) => {
         const card = document.createElement("button");
 
         card.type = "button";
         card.classList.add("card");
-
         card.setAttribute("aria-label", `Card ${i + 1}, face down`);
-
         card.dataset.index = i;
 
         board.appendChild(card);
     });
 }
 
-buildBoard();
+function startNewGame() {
+    if (flipTimer !== null) {
+        clearTimeout(flipTimer);
+        flipTimer = null;
+    }
 
+    waiting = false;
+    flippedCards.length = 0;
 
+    moves = 0;
+    movesDisplay.textContent = moves;
 
-const flippedCards = [];
+    status.textContent =
+        "Turn over two cards to find a matching pair.";
 
-const board = document.querySelector("#board");
+    status.classList.remove("you-won");
 
+    
+    deck = shuffle([...fruits, ...fruits]);
+    buildBoard();
+}
+startNewGame();
 
 board.addEventListener("click", (event) => {
     const card = event.target;
@@ -86,10 +99,14 @@ board.addEventListener("click", (event) => {
         moves++;
         movesDisplay.textContent = moves;
 
-        const firstFruit = deck[Number(flippedCards[0].dataset.index)];
-        const secondFruit = deck[Number(flippedCards[1].dataset.index)];
+        const firstFruit =
+            deck[Number(flippedCards[0].dataset.index)];
+
+        const secondFruit =
+            deck[Number(flippedCards[1].dataset.index)];
 
         if (firstFruit.name === secondFruit.name) {
+            // The cards match
             flippedCards[0].classList.add("matched");
             flippedCards[1].classList.add("matched");
 
@@ -100,22 +117,26 @@ board.addEventListener("click", (event) => {
 
             flippedCards.length = 0;
 
-            
-            const matchedCards = document.querySelectorAll("#board .matched");
+            // Check whether all 16 cards are matched
+            const matchedCards =
+                document.querySelectorAll("#board .matched");
 
             if (matchedCards.length === 16) {
-                status.textContent = `You found all the pairs in ${moves} moves!`;
+                status.textContent =
+                    `You found all the pairs in ${moves} moves!`;
+
                 status.classList.add("you-won");
             }
-
         } else {
+            // The cards do not match
             status.textContent = "Not a pair. Try again.";
 
             waiting = true;
 
-            setTimeout(() => {
+            flipTimer = setTimeout(() => {
                 flippedCards.forEach((flippedCard) => {
-                    const index = Number(flippedCard.dataset.index);
+                    const index =
+                        Number(flippedCard.dataset.index);
 
                     flippedCard.textContent = "";
                     flippedCard.classList.remove("flipped");
@@ -128,10 +149,10 @@ board.addEventListener("click", (event) => {
 
                 flippedCards.length = 0;
                 waiting = false;
+                flipTimer = null;
             }, 1000);
         }
     }
 });
 
-
-
+newGameButton.addEventListener("click", startNewGame);
