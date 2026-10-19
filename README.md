@@ -1,3 +1,4 @@
 # COMP2245 Lab 3
 
 This is Lab 3 for Your Jean-Marc de Gannes.
+Could only test on Chrome
